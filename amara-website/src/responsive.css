@@ -1,0 +1,31 @@
+/* ═══════════════════════════════════════════════
+   RESPONSIVE OVERRIDES — Mobile-first fixes
+   ═══════════════════════════════════════════════ */
+
+/* ─── Tablet (max 1024px) ─── */
+@media (max-width: 1024px) {
+  .section { padding: 70px 0; }
+}
+
+/* ─── Mobile (max 768px) ─── */
+@media (max-width: 768px) {
+  .section { padding: 50px 0; }
+  .container { padding: 0 16px; }
+
+  .btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ─── Small mobile (max 480px) ─── */
+@media (max-width: 480px) {
+  .container { padding: 0 12px; }
+
+  .btn {
+    padding: 11px 20px;
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+}
