@@ -310,7 +310,7 @@ const Footer: React.FC = () => {
       <div style={styles.brandText}>
         <h2
           style={{
-            fontSize: isMobile ? 40 : 72,
+            fontSize: isMobile ? 60 : 120,
             fontWeight: 800,
             letterSpacing: isMobile ? '2px' : '6px',
             margin: 0,
