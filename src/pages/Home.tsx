@@ -904,10 +904,6 @@ const Home: React.FC = () => {
     ...styles.btnOutlineWhite,
     ...(isMobile ? { width: '100%', justifyContent: 'center' } : {}),
   };
-  const rStatsInner: React.CSSProperties = {
-    ...styles.statsInner,
-    ...(isMobile ? { gap: 30, padding: '20px 16px' } : isTablet ? { gap: 40 } : {}),
-  };
   const rSliderControls: React.CSSProperties = {
     ...styles.sliderControls,
     ...(isMobile ? { bottom: 20 } : {}),
@@ -915,10 +911,6 @@ const Home: React.FC = () => {
   const rSliderControlsInner: React.CSSProperties = {
     ...styles.sliderControlsInner,
     ...(isMobile ? { padding: '0 16px', gap: 10 } : {}),
-  };
-  const rSliderCounter: React.CSSProperties = {
-    ...styles.sliderCounter,
-    ...(isMobile ? { display: 'none' } : {}),
   };
   const rAboutSection: React.CSSProperties = {
     ...styles.aboutSection,
@@ -963,14 +955,6 @@ const Home: React.FC = () => {
   const rWhyGrid: React.CSSProperties = {
     ...styles.whyGrid,
     gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-  };
-  const rCtaSection: React.CSSProperties = {
-    ...styles.ctaSection,
-    ...(isMobile ? { padding: '60px 0' } : {}),
-  };
-  const rCtaContainer: React.CSSProperties = {
-    ...styles.ctaContainer,
-    ...(isMobile ? { padding: '0 16px' } : {}),
   };
   const rHeroContainer: React.CSSProperties = {
     ...styles.heroContainer,
