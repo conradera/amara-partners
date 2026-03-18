@@ -90,7 +90,7 @@ const styles: Record<string, React.CSSProperties> = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'linear-gradient(135deg, rgba(4,48,73,0.88) 0%, rgba(4,48,73,0.75) 40%, rgba(0,0,0,0.65) 100%)',
+    background: 'rgba(0, 0, 0, 0.65)',
     zIndex: 1,
   },
   heroClip: {
@@ -562,18 +562,22 @@ const styles: Record<string, React.CSSProperties> = {
   /* ───────────── WHY CHOOSE US ───────────── */
   whySection: {
     padding: '100px 0',
-    background: 'var(--navy)',
+    background: 'transparent',
+    backgroundImage: 'url(/why-choose-us-bg.jpg)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundAttachment: 'fixed',
     position: 'relative',
     overflow: 'hidden',
   },
-  whyBgCircle: {
+  whyOverlay: {
     position: 'absolute',
-    width: 500,
-    height: 500,
-    borderRadius: '50%',
-    border: '1px solid rgba(255,255,255,0.04)',
-    top: -200,
-    right: -100,
+    inset: 0,
+    background: 'rgba(0, 0, 0, 0.72)',
+    zIndex: 0,
+  },
+  whyBgCircle: {
+    display: 'none',
   },
   whyContainer: {
     maxWidth: 1200,
@@ -1132,15 +1136,17 @@ const Home: React.FC = () => {
           </div>
 
           <div style={styles.aboutImgPlaceholder}>
-            <svg style={styles.aboutImgIcon} width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="var(--white)" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="3" width="20" height="14" rx="2" />
-              <line x1="8" y1="21" x2="16" y2="21" />
-              <line x1="12" y1="17" x2="12" y2="21" />
-              <line x1="7" y1="8" x2="7" y2="13" />
-              <line x1="10" y1="10" x2="10" y2="13" />
-              <line x1="13" y1="6" x2="13" y2="13" />
-              <line x1="16" y1="9" x2="16" y2="13" />
-            </svg>
+            <img
+              src="/amara-logo-about.jpg"
+              alt="Amara Partners"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                padding: '32px',
+                boxSizing: 'border-box',
+              }}
+            />
             <div style={styles.aboutImgAccent} />
           </div>
         </div>
@@ -1238,7 +1244,7 @@ const Home: React.FC = () => {
 
       {/* ──────── WHY CHOOSE US ──────── */}
       <section style={rWhySection}>
-        <div style={styles.whyBgCircle} />
+        <div style={styles.whyOverlay} />
         <div style={rWhyContainer}>
           <div style={styles.whyHeader}>
             <span style={{ ...styles.sectionLabel, color: 'var(--orange)' }}>
@@ -1284,6 +1290,7 @@ const Home: React.FC = () => {
           margin: '0 auto',
           padding: isMobile ? '0 16px' : '0 24px',
           textAlign: 'center' as const,
+          marginBottom: 48,
         }}>
           <span style={styles.sectionLabel}>Our Partners</span>
           <h2 style={{ ...styles.sectionTitle, textAlign: 'center' as const }}>
@@ -1291,70 +1298,66 @@ const Home: React.FC = () => {
           </h2>
           <p style={{
             ...styles.sectionSubtitle,
-            margin: '0 auto 48px',
+            margin: '0 auto',
             textAlign: 'center' as const,
           }}>
             We are proud to collaborate with organizations that share our commitment to
             financial excellence and integrity.
           </p>
+        </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : isTablet ? 'repeat(3, 1fr)' : 'repeat(6, 1fr)',
-            gap: isMobile ? 16 : 24,
-            alignItems: 'center',
-          }}>
-            {[
-              { name: 'ICPAU', full: 'Institute of Certified Public Accountants of Uganda' },
-              { name: 'URA', full: 'Uganda Revenue Authority' },
-              { name: 'URSB', full: 'Uganda Registration Services Bureau' },
-              { name: 'NSSF', full: 'National Social Security Fund' },
-              { name: 'IFRS', full: 'International Financial Reporting Standards' },
-              { name: 'ACCA', full: 'Association of Chartered Certified Accountants' },
-            ].map((partner) => (
-              <div
-                key={partner.name}
-                style={{
-                  background: 'var(--white)',
-                  borderRadius: 10,
-                  padding: isMobile ? '20px 12px' : '28px 20px',
-                  border: '1px solid var(--light-gray)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  transition: 'all 0.3s ease',
-                  cursor: 'default',
-                  minHeight: isMobile ? 90 : 110,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(4,48,73,0.08)';
-                  e.currentTarget.style.borderColor = 'var(--orange)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = 'var(--light-gray)';
-                }}
-              >
-                <span style={{
-                  fontSize: isMobile ? '18px' : '22px',
-                  fontWeight: 800,
-                  color: 'var(--navy)',
-                  letterSpacing: '0.05em',
-                  fontFamily: "'Inter', -apple-system, sans-serif",
-                }}>
-                  {partner.name}
-                </span>
-                <span style={{
-                  fontSize: '11px',
-                  color: 'var(--muted-foreground)',
-                  lineHeight: 1.3,
-                  textAlign: 'center' as const,
-                }}>
-                  {partner.full}
-                </span>
-              </div>
+        {/* Marquee strip */}
+        <div className="marquee-wrapper">
+          <div className="marquee-track">
+            {/* Render twice for seamless infinite loop */}
+            {[...Array(2)].map((_, setIdx) => (
+              [
+                { src: '/logo-icpau.png', alt: 'ICPAU – Institute of Certified Public Accountants of Uganda' },
+                { src: '/logo-acca.png', alt: 'ACCA – Association of Chartered Certified Accountants' },
+                { src: '/logo-nssf.png', alt: 'NSSF – National Social Security Fund' },
+                { src: '/logo-ursb.png', alt: 'URSB – Uganda Registration Services Bureau' },
+                { src: '/logo-ura.png', alt: 'URA – Uganda Revenue Authority' },
+                { src: '/logo-togashi.png', alt: 'Togashi Technologies' },
+              ].map((logo) => (
+                <div
+                  key={`${setIdx}-${logo.alt}`}
+                  style={{
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--white)',
+                    border: '1px solid var(--light-gray)',
+                    borderRadius: 12,
+                    padding: '18px 36px',
+                    marginRight: 28,
+                    height: 100,
+                    minWidth: 180,
+                    boxSizing: 'border-box' as const,
+                    transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(4,48,73,0.10)';
+                    e.currentTarget.style.borderColor = 'var(--orange)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.borderColor = 'var(--light-gray)';
+                  }}
+                >
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    style={{
+                      height: 60,
+                      width: 'auto',
+                      maxWidth: 150,
+                      objectFit: 'contain',
+                      display: 'block',
+                    }}
+                  />
+                </div>
+              ))
             ))}
           </div>
         </div>

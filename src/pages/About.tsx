@@ -3,90 +3,298 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useIsMobile, useIsTablet } from '../hooks/useIsMobile';
 
-/* ─── Team Grid with Read More ─── */
-const TeamGrid: React.FC<{
-  teamGrid: React.CSSProperties;
-  teamCard: React.CSSProperties;
-  teamCardBody: React.CSSProperties;
-  teamName: React.CSSProperties;
-  teamTitle: React.CSSProperties;
-  teamBio: React.CSSProperties;
-  teamMembers: { name: string; role: string; color: string; bio: string }[];
+/* ─── Spotlight Fan Team Component ─── */
+const TeamSpotlight: React.FC<{
+  teamMembers: { name: string; role: string; color: string; bio: string; initials: string; photo?: string }[];
   isMobile?: boolean;
-}> = ({ teamGrid, teamCard, teamCardBody, teamName, teamTitle, teamBio, teamMembers, isMobile }) => {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+}> = ({ teamMembers, isMobile }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const readMoreBtn: React.CSSProperties = {
-    background: 'none',
-    border: 'none',
-    color: '#F47F20',
-    fontSize: '13px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    padding: '6px 0 0',
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    transition: 'color 0.2s ease',
+  const total = teamMembers.length;
+
+  /* Compute offset of each member relative to active (wrapping) */
+  const getOffset = (i: number) => {
+    let diff = i - activeIndex;
+    if (diff > total / 2) diff -= total;
+    if (diff < -total / 2) diff += total;
+    return diff;
   };
 
+  const prev = () => setActiveIndex((activeIndex - 1 + total) % total);
+  const next = () => setActiveIndex((activeIndex + 1) % total);
+
+  /* Style per offset position */
+  const memberStyle = (offset: number): React.CSSProperties => {
+    const abs = Math.abs(offset);
+    if (abs > 2) return { display: 'none' };
+
+    const configs: Record<number, {
+      x: number; scale: number; zIndex: number; opacity: number; blur: number;
+    }> = {
+      0: { x: 0, scale: 1, zIndex: 10, opacity: 1, blur: 0 },
+      1: { x: 230, scale: 0.78, zIndex: 7, opacity: 0.75, blur: 0 },
+      2: { x: 410, scale: 0.60, zIndex: 5, opacity: 0.50, blur: 1 },
+    };
+
+    const cfg = configs[abs];
+    const translateX = offset < 0 ? -cfg.x : cfg.x;
+
+    return {
+      position: 'absolute' as const,
+      top: offset === 0 ? '0px' : `${30 + (abs - 1) * 24}px`,
+      left: '50%',
+      transform: `translateX(calc(-50% + ${translateX}px)) scale(${cfg.scale})`,
+      zIndex: cfg.zIndex,
+      opacity: cfg.opacity,
+      filter: offset !== 0 ? `grayscale(100%) blur(${cfg.blur}px)` : 'none',
+      transition: 'all 0.5s cubic-bezier(0.4,0,0.2,1)',
+      cursor: offset !== 0 ? 'pointer' : 'default',
+      width: isMobile ? '180px' : '280px',
+      transformOrigin: 'top center',
+    };
+  };
+
+  const active = teamMembers[activeIndex];
+  const cardH = isMobile ? 260 : 380;
+
   return (
-    <div style={teamGrid}>
-      {teamMembers.map((member, i) => (
-        <div key={member.name} style={teamCard}>
-          <div
+    <div style={{ width: '100%' }}>
+      {/* Fan stage */}
+      <div style={{
+        position: 'relative',
+        height: isMobile ? `${cardH + 60}px` : `${cardH + 80}px`,
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+      }}>
+        {teamMembers.map((member, i) => {
+          const offset = getOffset(i);
+          const abs = Math.abs(offset);
+          if (abs > 2) return null;
+
+          return (
+            <div
+              key={member.name}
+              style={memberStyle(offset)}
+              onClick={() => { if (offset !== 0) setActiveIndex(i); }}
+            >
+              {/* Photo area */}
+              <div style={{
+                width: '100%',
+                height: `${cardH}px`,
+                background: `linear-gradient(160deg, ${member.color} 0%, ${member.color}99 100%)`,
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: offset === 0
+                  ? '0 24px 60px rgba(0,0,0,0.28)'
+                  : '0 8px 24px rgba(0,0,0,0.15)',
+              }}>
+                {/* Photo or Placeholder */}
+                {member.photo ? (
+                  <img
+                    src={member.photo}
+                    alt={member.name}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'top center',
+                      display: 'block',
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    textAlign: 'center',
+                    opacity: 0.6,
+                    transform: offset === 0 ? 'scale(1)' : 'scale(0.8)',
+                    transition: 'transform 0.5s ease',
+                  }}>
+                    <svg width={isMobile ? "80" : "120"} height={isMobile ? "80" : "120"} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <div style={{
+                      marginTop: '8px',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      color: 'rgba(255,255,255,0.4)',
+                      letterSpacing: '0.1em',
+                    }}>
+                      {member.initials}
+                    </div>
+                  </div>
+                )}
+
+                {/* Name card overlay at bottom */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: 'rgba(15,15,15,0.88)',
+                  backdropFilter: 'blur(6px)',
+                  padding: offset === 0
+                    ? (isMobile ? '16px 20px' : '22px 28px')
+                    : (isMobile ? '12px 14px' : '16px 18px'),
+                  borderBottomLeftRadius: '16px',
+                  borderBottomRightRadius: '16px',
+                }}>
+                  <div style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: 700,
+                    fontSize: offset === 0
+                      ? (isMobile ? '16px' : '20px')
+                      : (isMobile ? '12px' : '14px'),
+                    color: '#FFFFFF',
+                    lineHeight: 1.2,
+                    marginBottom: '4px',
+                    letterSpacing: '-0.01em',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                    {member.name}
+                  </div>
+                  <div style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: offset === 0
+                      ? (isMobile ? '11px' : '14px')
+                      : (isMobile ? '10px' : '11px'),
+                    color: '#F47F20',
+                    fontWeight: 600,
+                    letterSpacing: '0.07em',
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                    {member.role}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Bio + Nav */}
+      <div style={{
+        maxWidth: '560px',
+        margin: '0 auto',
+        textAlign: 'center' as const,
+        padding: isMobile ? '24px 16px 0' : '32px 24px 0',
+      }}>
+        <p style={{
+          fontSize: isMobile ? '14px' : '15px',
+          color: 'var(--muted-foreground)',
+          lineHeight: 1.7,
+          fontFamily: "'Inter', sans-serif",
+          marginBottom: '28px',
+          minHeight: isMobile ? '60px' : '72px',
+          transition: 'opacity 0.3s ease',
+        }}>
+          {active.bio}
+        </p>
+
+        {/* Navigation dots + arrows */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+        }}>
+          {/* Prev arrow */}
+          <button
+            onClick={prev}
             style={{
-              width: '100%',
-              height: isMobile ? '160px' : '240px',
-              background: `linear-gradient(135deg, ${member.color} 0%, ${member.color}CC 100%)`,
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: '2px solid var(--light-gray)',
+              background: '#fff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = '#F47F20';
+              (e.currentTarget as HTMLElement).style.background = '#F47F20';
+              (e.currentTarget as HTMLElement).style.color = '#fff';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'var(--light-gray)';
+              (e.currentTarget as HTMLElement).style.background = '#fff';
             }}
           >
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
             </svg>
-          </div>
-          <div style={teamCardBody}>
-            <h3 style={teamName}>{member.name}</h3>
-            <div style={teamTitle}>{member.role}</div>
-            {expandedIndex === i ? (
-              <>
-                <p style={teamBio}>{member.bio}</p>
-                <button
-                  style={readMoreBtn}
-                  onClick={() => setExpandedIndex(null)}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#D82929'; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#F47F20'; }}
-                >
-                  Show Less
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="18 15 12 9 6 15" />
-                  </svg>
-                </button>
-              </>
-            ) : (
+          </button>
+
+          {/* Dots */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {teamMembers.map((_, i) => (
               <button
-                style={readMoreBtn}
-                onClick={() => setExpandedIndex(i)}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#D82929'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#F47F20'; }}
-              >
-                Read More
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-            )}
+                key={i}
+                onClick={() => setActiveIndex(i)}
+                style={{
+                  width: i === activeIndex ? '24px' : '8px',
+                  height: '8px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  background: i === activeIndex ? '#F47F20' : 'var(--light-gray)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  transition: 'all 0.3s ease',
+                }}
+              />
+            ))}
           </div>
+
+          {/* Next arrow */}
+          <button
+            onClick={next}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: '2px solid var(--light-gray)',
+              background: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = '#F47F20';
+              (e.currentTarget as HTMLElement).style.background = '#F47F20';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'var(--light-gray)';
+              (e.currentTarget as HTMLElement).style.background = '#fff';
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
         </div>
-      ))}
+      </div>
     </div>
   );
 };
+
 
 const About: React.FC = () => {
   const isMobile = useIsMobile();
@@ -298,50 +506,9 @@ const About: React.FC = () => {
     margin: 0,
   };
 
-  // Leadership Team
-  const teamGrid: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : isTablet ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)',
-    gap: isMobile ? '16px' : '24px',
-  };
-
-  const teamCard: React.CSSProperties = {
-    background: '#FFFFFF',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.05)',
-  };
-
-  const teamCardBody: React.CSSProperties = {
-    padding: '24px',
-  };
-
-  const teamName: React.CSSProperties = {
-    fontSize: '16px',
-    fontWeight: 700,
-    color: 'var(--foreground)',
-    marginTop: 0,
-    marginBottom: '4px',
-    lineHeight: 1.25,
-    letterSpacing: '-0.01em',
-  };
-
-  const teamTitle: React.CSSProperties = {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: '#F47F20',
-    marginBottom: '12px',
-  };
-
-  const teamBio: React.CSSProperties = {
-    fontSize: '14px',
-    color: 'var(--muted-foreground)',
-    lineHeight: 1.625,
-    margin: 0,
-  };
 
   // ─── Data ─────────────────────────────────────────────────
+
 
   const coreValues = [
     {
@@ -400,64 +567,70 @@ const About: React.FC = () => {
 
   const teamMembers = [
     {
+      name: 'Peter Ruhinja',
+      role: 'Associate',
+      color: '#043049',
+      initials: 'PR',
+      photo: '/team-peter.jpg',
+      bio: 'Peter focuses on risk management and financial reporting, helping organisations strengthen their internal controls and governance.',
+    },
+    {
+      name: 'Conrad Gumisiriza',
+      role: 'IT Support',
+      color: '#043049',
+      initials: 'CG',
+      photo: '/team-conrad.jpg',
+      bio: 'Conrad manages the firm\'s technology infrastructure, ensuring secure and efficient systems that support the team\'s operations.',
+    },
+    {
       name: 'Amara Oto',
       role: 'Managing Partner',
       color: '#043049',
+      initials: 'AO',
       bio: 'Amara leads the firm with a strategic vision focused on delivering excellence in accounting and advisory services across East Africa.',
     },
     {
       name: 'Akunda Ute',
       role: 'Partner',
       color: '#D82929',
+      initials: 'AU',
+      photo: '/team-ute.jpg',
       bio: 'Akunda brings extensive expertise in audit and assurance, providing trusted advisory services to clients across diverse sectors.',
     },
     {
       name: 'Nicholas Bwebale',
       role: 'Director — Compliance',
       color: '#F47F20',
+      initials: 'NB',
       bio: 'Nicholas oversees compliance and regulatory affairs, ensuring clients meet all statutory requirements with precision and integrity.',
     },
     {
       name: 'Bashir Kasirye',
       role: 'Associate',
       color: '#043049',
+      initials: 'BK',
       bio: 'Bashir specialises in financial consulting and business advisory, helping businesses optimise their financial performance.',
-    },
-    {
-      name: 'Elonebeth Nayebare',
-      role: 'Associate',
-      color: '#D82929',
-      bio: 'Elonebeth provides expert support in tax advisory and accounting services, ensuring accuracy and compliance for all clients.',
     },
     {
       name: 'Humphrey Nuwahereza',
       role: 'Associate',
       color: '#F47F20',
+      initials: 'HN',
       bio: 'Humphrey delivers comprehensive audit and assurance services, bringing a meticulous and detail-oriented approach to every engagement.',
-    },
-    {
-      name: 'Peter Ruhinja',
-      role: 'Associate',
-      color: '#043049',
-      bio: 'Peter focuses on risk management and financial reporting, helping organisations strengthen their internal controls and governance.',
     },
     {
       name: 'Violet Alinda',
       role: 'Practice Manager',
       color: '#D82929',
+      initials: 'VA',
       bio: 'Violet manages the firm\'s day-to-day operations, ensuring seamless service delivery and exceptional client experience.',
     },
     {
       name: 'Agaba Osbert',
       role: 'Consultant',
       color: '#F47F20',
+      initials: 'AO',
       bio: 'Agaba provides specialised consulting services in business strategy and financial planning for growing enterprises.',
-    },
-    {
-      name: 'Conrad Gumisiriza',
-      role: 'IT Support',
-      color: '#043049',
-      bio: 'Conrad manages the firm\'s technology infrastructure, ensuring secure and efficient systems that support the team\'s operations.',
     },
   ];
 
@@ -493,7 +666,27 @@ const About: React.FC = () => {
         <div style={heroDiagonal} />
       </section>
 
-      {/* ═══ 2. Our Story ═══ */}
+      {/* ═══ 2. Leadership Team ═══ */}
+      <section style={{ ...sectionPadding, background: '#FFFFFF' }}>
+        <div style={container}>
+          <div style={centeredText}>
+            <h2 style={{ ...sectionTitle, marginLeft: 'auto', marginRight: 'auto' }}>
+              Our Team
+            </h2>
+            <p style={{ ...sectionSubtitle, marginLeft: 'auto', marginRight: 'auto' }}>
+              Meet the dedicated professionals behind Amara Partners who deliver
+              excellence in every engagement.
+            </p>
+          </div>
+
+          <TeamSpotlight
+            teamMembers={teamMembers}
+            isMobile={isMobile}
+          />
+        </div>
+      </section>
+
+      {/* ═══ 3. Our Story ═══ */}
       <section style={{ ...sectionPadding, background: '#F7F9FC' }}>
         <div style={container}>
           <div style={storyGrid}>
@@ -527,7 +720,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      {/* ═══ 3. Mission & Vision ═══ */}
+      {/* ═══ 4. Mission & Vision ═══ */}
       <section style={{ ...sectionPadding, background: '#FFFFFF' }}>
         <div style={container}>
           <div style={centeredText}>
@@ -575,7 +768,7 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      {/* ═══ 4. Core Values ═══ */}
+      {/* ═══ 5. Core Values ═══ */}
       <section style={{ ...sectionPadding, background: '#F7F9FC' }}>
         <div style={container}>
           <div style={centeredText}>
@@ -597,32 +790,6 @@ const About: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ═══ 5. Leadership Team ═══ */}
-      <section style={{ ...sectionPadding, background: '#FFFFFF' }}>
-        <div style={container}>
-          <div style={centeredText}>
-            <h2 style={{ ...sectionTitle, marginLeft: 'auto', marginRight: 'auto' }}>
-              Our Team
-            </h2>
-            <p style={{ ...sectionSubtitle, marginLeft: 'auto', marginRight: 'auto' }}>
-              Meet the dedicated professionals behind Amara Partners who deliver
-              excellence in every engagement.
-            </p>
-          </div>
-
-          <TeamGrid
-            teamGrid={teamGrid}
-            teamCard={teamCard}
-            teamCardBody={teamCardBody}
-            teamName={teamName}
-            teamTitle={teamTitle}
-            teamBio={teamBio}
-            teamMembers={teamMembers}
-            isMobile={isMobile}
-          />
         </div>
       </section>
     </div>
