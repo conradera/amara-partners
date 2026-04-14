@@ -565,7 +565,22 @@ const About: React.FC = () => {
     },
   ];
 
-  const teamMembers = [
+const teamMembers = [
+    {
+      name: 'Amara Oto',
+      role: 'Managing Partner',
+      color: '#043049',
+      initials: 'AO',
+      bio: 'Amara leads the firm with a strategic vision focused on delivering excellence in accounting and advisory services across East Africa.',
+    },
+    {
+      name: 'Akunda Ute',
+      role: 'Partner',
+      color: '#D82929',
+      initials: 'AU',
+      photo: '/team-ute.jpg',
+      bio: 'Akunda brings extensive expertise in audit and assurance, providing trusted advisory services to clients across diverse sectors.',
+    },
     {
       name: 'Peter Ruhinja',
       role: 'Associate',
@@ -583,33 +598,11 @@ const About: React.FC = () => {
       bio: 'Conrad manages the firm\'s technology infrastructure, ensuring secure and efficient systems that support the team\'s operations.',
     },
     {
-      name: 'Amara Oto',
-      role: 'Managing Partner',
-      color: '#043049',
-      initials: 'AO',
-      bio: 'Amara leads the firm with a strategic vision focused on delivering excellence in accounting and advisory services across East Africa.',
-    },
-    {
-      name: 'Akunda Ute',
-      role: 'Partner',
-      color: '#D82929',
-      initials: 'AU',
-      photo: '/team-ute.jpg',
-      bio: 'Akunda brings extensive expertise in audit and assurance, providing trusted advisory services to clients across diverse sectors.',
-    },
-    {
-      name: 'Nicholas Bwebale',
-      role: 'Director — Compliance',
-      color: '#F47F20',
-      initials: 'NB',
-      bio: 'Nicholas oversees compliance and regulatory affairs, ensuring clients meet all statutory requirements with precision and integrity.',
-    },
-    {
       name: 'Bashir Kasirye',
       role: 'Associate',
       color: '#043049',
       initials: 'BK',
-      bio: 'Bashir specialises in financial consulting and business advisory, helping businesses optimise their financial performance.',
+      bio: 'Bashir specializes in financial consulting and business advisory, helping businesses optimise their financial performance.',
     },
     {
       name: 'Humphrey Nuwahereza',
@@ -617,6 +610,13 @@ const About: React.FC = () => {
       color: '#F47F20',
       initials: 'HN',
       bio: 'Humphrey delivers comprehensive audit and assurance services, bringing a meticulous and detail-oriented approach to every engagement.',
+    },
+    {
+      name: 'Nicholas Bwebale',
+      role: 'Director — Compliance',
+      color: '#F47F20',
+      initials: 'NB',
+      bio: 'Nicholas oversees compliance and regulatory affairs, ensuring clients meet all statutory requirements with precision and integrity.',
     },
     {
       name: 'Violet Alinda',
@@ -627,10 +627,31 @@ const About: React.FC = () => {
     },
     {
       name: 'Agaba Osbert',
-      role: 'Consultant',
+      role: 'Consultant — Corporate, Tax & Regulatory Compliance',
       color: '#F47F20',
       initials: 'AO',
-      bio: 'Agaba provides specialised consulting services in business strategy and financial planning for growing enterprises.',
+      bio: 'Agaba provides specialized consulting services in corporate structuring, tax planning, and regulatory compliance.',
+    },
+    {
+      name: 'Muhangunzi Tumwiine Bob',
+      role: 'Consultant — Disputes, Estate & Land Compliance',
+      color: '#F47F20',
+      initials: 'MTB',
+      bio: 'Bob provides specialised consulting in disputes resolution, estate planning, and land compliance matters.',
+    },
+    {
+      name: 'Abaho Eliab',
+      role: 'Consultant — Procurement Audit',
+      color: '#F47F20',
+      initials: 'AE',
+      bio: 'Eliab provides specialised procurement audit and advisory services, ensuring compliance and value for money.',
+    },
+    {
+      name: 'Alex Mukiibi',
+      role: 'Consultant — Human Capital, Governance & Board Advisory',
+      color: '#F47F20',
+      initials: 'AM',
+      bio: 'Alex provides specialised consulting in human capital development, corporate governance, and board advisory.',
     },
   ];
 
